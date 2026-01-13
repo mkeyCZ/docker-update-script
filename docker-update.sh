@@ -7,18 +7,13 @@ DATE=$(date '+%Y-%m-%d %H:%M:%S') #format aktualuaci
 
 # seznam povolených kontejnerů
 UPDATE_LIST=(
-  audiobookshelf
-  calibre-web
-  flatnotes
+  flatnots
   glance
   homebridge
   miniflux
-  nginx
-  vaultwarden
-  rustdesk
 )
 
-echo "[$DATE] Starting Docker update (whitelist mode)" >> "$LOG"
+echo "[$DATE] Starting Docker update (whitelist mode)" >> "$LOG" #zprava o spusteni
 
 UPDATED=false
 
