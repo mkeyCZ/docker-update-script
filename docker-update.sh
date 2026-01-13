@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-BASE_DIR="/home/mates/docker"
-LOG="/var/log/docker-update.log"
-DATE=$(date '+%Y-%m-%d %H:%M:%S')
+BASE_DIR="/home/mates/docker" #kde se maji provadet aktualizace
+LOG="/var/log/docker-update.log" #kam ulozit log aktualizaci
+DATE=$(date '+%Y-%m-%d %H:%M:%S') #format aktualuaci
 
 # seznam povolených kontejnerů
 UPDATE_LIST=(
