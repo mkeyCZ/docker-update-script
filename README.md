@@ -5,10 +5,7 @@ Tento skript slouží k automatické kontrole a aktualizaci vybraných Docker pr
 ### Požadavky
 
 * Linux
-* Docker + Docker Compose v2 (`docker compose`)
-* Bash 4+ (kvůli asociativním polím)
-* Přístup k Docker socketu (uživatel v group `docker` nebo spuštění přes root)
-
+* Docker + Docker Compose (`docker compose`)
 ---
 
 ### 1. Naklonování projektu
