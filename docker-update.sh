@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
 
-# Zakladni nastaveni
 ZAKLADNI_SLOZKA="/home/mates/docker"
 LOG="/home/mates/update-docker-script/docker-update.log"
 DATUM=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Whitelist slozek, ktere se mohou aktualizovat
 AKTUALIZOVAT=(
   flatnotes
   glance
@@ -14,39 +12,42 @@ AKTUALIZOVAT=(
   miniflux
 )
 
-echo "[$DATUM] Spoustim aktualizaci Dockeru" >> "$LOG"
+echo "[$DATUM] Spoustim aktualizaci Dockeru" | tee -a "$LOG"
 
 AKTUALIZOVANE_SLUZBY=()
 
 for SLUZBA in "${AKTUALIZOVAT[@]}"; do
   SLOZKA="$ZAKLADNI_SLOZKA/$SLUZBA"
 
-  # Kontrola existence slozky a docker-compose.yml
   [ -d "$SLOZKA" ] || continue
   [ -f "$SLOZKA/docker-compose.yml" ] || continue
 
+  echo "Kontroluji $SLUZBA..."
   cd "$SLOZKA"
 
-  # Docker compose V2 uz nepise "Downloaded newer image",
-  # ale "Image xxx Pulled", proto hledame " Pulled"
-  if docker compose pull 2>&1 | tee -a "$LOG" | grep -q " Pulled"; then
-    docker compose up -d >> "$LOG" 2>&1
+  # Docker vypis jde jen do terminalu, ne do logu
+  VYSTUP=$(docker compose pull 2>&1 | tee /dev/tty)
+
+  if echo "$VYSTUP" | grep -q " Pulled"; then
+    echo "Aktualizuji $SLUZBA..."
+    docker compose up -d
+
     AKTUALIZOVANE_SLUZBY+=("$SLUZBA")
+  else
+    echo "$SLUZBA je aktualni."
   fi
 done
 
-# Zapis vysledku do logu
+# Shrnutí jen do logu (a trochu i do terminalu)
 if [ "${#AKTUALIZOVANE_SLUZBY[@]}" -gt 0 ]; then
-  echo "[$DATUM] Aktualizovane sluzby:" >> "$LOG"
+  echo "[$DATUM] Aktualizovane sluzby:" | tee -a "$LOG"
   for S in "${AKTUALIZOVANE_SLUZBY[@]}"; do
-    echo "  - $S" >> "$LOG"
+    echo "  - $S" | tee -a "$LOG"
   done
-
-  # Odstraneni starych nepouzivanych imagu
-  docker image prune -f >> "$LOG" 2>&1
+  docker image prune -f > /dev/null 2>&1
 else
-  echo "[$DATUM] Nebyly nalezeny zadne aktualizace" >> "$LOG"
+  echo "[$DATUM] Nebyly nalezeny zadne aktualizace" | tee -a "$LOG"
 fi
 
-echo "[$DATUM] Aktualizace Dockeru dokoncena" >> "$LOG"
+echo "[$DATUM] Aktualizace Dockeru dokoncena" | tee -a "$LOG"
 echo "----------------------------------------" >> "$LOG"
